@@ -22,16 +22,18 @@ NumGoals getGoalsPerGame(const std::vector<std::unique_ptr<Player>> players)
 
 }  // namespace
 
-namespace ws::sim {
+namespace ws {
+namespace sim {
 
-Result Simulator::playMatch(Team *team1, Team *team2)
+  Result Simulator::playMatch(Team *team1, Team *team2)
 {
   auto matches = _loader->getMatchesBetween(*team1, *team2);
   NumGoals goals1{0};
   NumGoals goals2{0};
 
   for (auto &match : matches) {
-    auto [players1, players2] = _loader->getPlayersOfMatch(match);
+    std::vector<std::unique_ptr<Player>> players1, players2;
+    std::tie(players1, players2) = _loader->getPlayersOfMatch(match);
     goals1.get() += getGoalsPerGame(std::move(players1)).get() + match.t1Goals.get();
     goals2.get() += getGoalsPerGame(std::move(players2)).get() + match.t2Goals.get();
 
@@ -52,8 +54,9 @@ Result Simulator::playMatch(Team *team1, Team *team2)
     return Result(team2, team1, goals2, goals1);
 }
 
-  std::unique_ptr<Team> Simulator::getTeam(TeamName name) {
+std::unique_ptr<Team> Simulator::getTeam(TeamName name) {
     return _loader->getTeam(name);
   }
 
-}  // namespace ws::sim
+}  // namespace sim
+}  // namespace ws

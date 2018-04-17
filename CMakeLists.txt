@@ -4,7 +4,7 @@ set(THIS WMSim)
 
 project(${THIS})
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
 # sqlite--------------------------------------------------------------------------------------------
 ExternalProject_Add (sqlite

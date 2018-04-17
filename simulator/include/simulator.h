@@ -2,22 +2,24 @@
 
 #include "dbloader.h"
 
-namespace ws::sim {
+namespace ws {
+namespace sim {
 
-using ws::wm::Result;
-using ws::db::Loader;
+  using ws::wm::Result;
+  using ws::db::Loader;
 
-class Simulator
+  class Simulator
 {
- public:
+  public:
   explicit Simulator(Loader *loader) : _loader(loader) {}
   ~Simulator() = default;
 
   Result playMatch(Team *team1, Team *team2);
   std::unique_ptr<Team> getTeam(TeamName name);
 
- private:
+  private:
   Loader *_loader;
 };
 
-}  // namespace ws::sim
+}  // namespace sim
+}  // namespace ws

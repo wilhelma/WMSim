@@ -39,7 +39,7 @@ void visualizeGames(const std::vector<ws::wm::Result> &results)
 {
   constexpr char limiter[] = "------------------";
 
-  for (auto i{0}; i < results.size(); ++i) { cout << limiter << ' '; }
+  for (size_t i{0}; i < results.size(); ++i) { cout << limiter << ' '; }
   cout << '\n';
   for (const auto &result : results) {
     cout << "| " << transform(result.winner->name) << ' ' << transform(result.winnerGoals) << " | ";
@@ -49,13 +49,14 @@ void visualizeGames(const std::vector<ws::wm::Result> &results)
     cout << "| " << transform(result.second->name) << ' ' << transform(result.secondGoals) << " | ";
   }
   cout << '\n';
-  for (auto i{0}; i < results.size(); ++i) { cout << limiter << ' '; }
+  for (size_t i{0}; i < results.size(); ++i) { cout << limiter << ' '; }
   cout << '\n';
 }
 
 }  // namespace
 
-namespace ws::vis {
+namespace ws {
+namespace vis {
 
 void Visualizer::visualizeStage(const std::string &stageName, const std::vector<Result> &results)
 {
@@ -63,4 +64,5 @@ void Visualizer::visualizeStage(const std::string &stageName, const std::vector<
   visualizeGames(results);
 }
 
-}  // namespace ws::vis
+}  // namespace vis
+}  // namespace ws

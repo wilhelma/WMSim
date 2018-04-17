@@ -1,7 +1,10 @@
 #include "wm.h"
 #include <wm.h>
+#include <vector>
+#include <algorithm>
 
-namespace ws::wm {
+namespace ws {
+namespace wm {
 
 Best16 WM::playGroupPhase()
 {
@@ -75,7 +78,7 @@ Final WM::playSemiFinals(const Semi &semi)
 
 Team *WM::playFinal(const Final &final)
 {
-  std::vector result{_simulator->playMatch(final.result1.winner, final.result2.winner)};
+  std::vector<Result> result{_simulator->playMatch(final.result1.winner, final.result2.winner)};
   _visualizer->visualizeStage("Final", result);
   return result.at(0).winner;
 }
@@ -94,7 +97,7 @@ Result WM::playGroup(const std::string &groupName, Group *group)
   _visualizer->visualizeStage(groupName, results);
 
   std::vector<Team *> teams{
-    group->team1.get(), group->team2.get(), group->team3.get(), group->team4.get()};
+      group->team1.get(), group->team2.get(), group->team3.get(), group->team4.get()};
   std::sort(std::begin(teams), std::end(teams), [](Team *a, Team *b) {
     return (a->points.get() > b->points.get() ||
             (a->points.get() == b->points.get() &&
@@ -111,27 +114,29 @@ Result WM::playGroup(const std::string &groupName, Group *group)
 void WM::playWM()
 {
   _groupA = createGroup(
-    TeamName("Frankreich"), TeamName("Rumänien"), TeamName("Albanien"), TeamName("Schweiz"));
+      TeamName("Frankreich"), TeamName("Rumänien"), TeamName("Albanien"), TeamName("Schweiz"));
   _groupB =
-    createGroup(TeamName("England"), TeamName("Rußland"), TeamName("Wales"), TeamName("Slowakei"));
+      createGroup(TeamName("England"), TeamName("Rußland"), TeamName("Wales"),
+                  TeamName("Slowakei"));
   _groupC = createGroup(
-    TeamName("Deutschland"), TeamName("Ukraine"), TeamName("Polen"), TeamName("Nordirland"));
+      TeamName("Deutschland"), TeamName("Ukraine"), TeamName("Polen"), TeamName("Nordirland"));
   _groupD = createGroup(
-    TeamName("Spanien"), TeamName("Tschechien"), TeamName("Türkei"), TeamName("Kroatien"));
+      TeamName("Spanien"), TeamName("Tschechien"), TeamName("Türkei"), TeamName("Kroatien"));
   _groupE =
-    createGroup(TeamName("Belgien"), TeamName("Italien"), TeamName("Irland"), TeamName("Schweden"));
+      createGroup(TeamName("Belgien"), TeamName("Italien"), TeamName("Irland"),
+                  TeamName("Schweden"));
   _groupF = createGroup(
-    TeamName("Portugal"), TeamName("Island"), TeamName("Österreich"), TeamName("Ungarn"));
+      TeamName("Portugal"), TeamName("Island"), TeamName("Österreich"), TeamName("Ungarn"));
   _groupG = createGroup(
-    TeamName("Bulgarien"), TeamName("Dänemark"), TeamName("Finnland"), TeamName("Griechenland"));
+      TeamName("Bulgarien"), TeamName("Dänemark"), TeamName("Finnland"), TeamName("Griechenland"));
   _groupH = createGroup(
-    TeamName("Niederlande"), TeamName("Schottland"), TeamName("Israel"), TeamName("Lettland"));
+      TeamName("Niederlande"), TeamName("Schottland"), TeamName("Israel"), TeamName("Lettland"));
 
-  auto best16  = playGroupPhase();
+  auto best16 = playGroupPhase();
   auto quarter = playRoundOfBest16(best16);
-  auto semi    = playQuarterFinals(quarter);
-  auto final   = playSemiFinals(semi);
-  auto winner  = playFinal(final);
+  auto semi = playQuarterFinals(quarter);
+  auto final = playSemiFinals(semi);
+  auto winner = playFinal(final);
 }
 
 Group WM::createGroup(TeamName team1, TeamName team2, TeamName team3, TeamName team4) const
@@ -144,4 +149,5 @@ Group WM::createGroup(TeamName team1, TeamName team2, TeamName team3, TeamName t
   return group;
 }
 
-}  // namespace ws::wm
+} // namespace wm
+} // namespace ws
