@@ -5,11 +5,12 @@ set(THIS WMSim)
 project(${THIS})
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-fno-omit-frame-pointer")
 
 # sqlite--------------------------------------------------------------------------------------------
 ExternalProject_Add (sqlite
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite
-        URL https://www.sqlite.org/2018/sqlite-autoconf-3220000.tar.gz
+        URL http://www.sqlite.org/2018/sqlite-autoconf-3220000.tar.gz
         CONFIGURE_COMMAND ${CMAKE_CURRENT_BINARY_DIR}/sqlite/configure
         BUILD_COMMAND ${MAKE}
         BUILD_IN_SOURCE 1
@@ -43,4 +44,4 @@ include_directories(${INCLUDE_DIR} ${DAT_INCLUDE_DIR} ${SIM_INCLUDE_DIR} ${VIS_I
 
 add_executable(${THIS} ${SOURCES} ${HEADERS})
 add_dependencies(${THIS} sqlite)
-target_link_libraries(${THIS} sqlite3)
+target_link_libraries(${THIS} sqlite3 pthread)

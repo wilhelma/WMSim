@@ -2,6 +2,7 @@
 
 #include "model.h"
 #include "../../include/model.h"
+#include <vector>
 
 namespace ws::vis {
 
