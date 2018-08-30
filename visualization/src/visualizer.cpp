@@ -62,6 +62,9 @@ void Visualizer::visualizeStage(const std::string &stageName, const std::vector<
 {
   cout << stageName << '\n';
   visualizeGames(results);
+
+  if (results.size() == 1)
+    cout << "\nNumber of total goals: " << *totalGoals << '\n';
 }
 
 }  // namespace vis

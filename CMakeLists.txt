@@ -6,6 +6,8 @@ project(${THIS})
 
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_CXX_FLAGS 	"-fno-omit-frame-pointer -fno-inline")
+
 # sqlite--------------------------------------------------------------------------------------------
 ExternalProject_Add (sqlite
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite

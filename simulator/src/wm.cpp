@@ -43,8 +43,13 @@ Quarter WM::playRoundOfBest16(const Best16 &best)
                               quarter.result6,
                               quarter.result7,
                               quarter.result8};
-  _visualizer->visualizeStage("Round Of Best 16", results);
 
+  for (const auto result: results) {
+    _totalGoals += result.winnerGoals.get() + result.secondGoals.get();
+  }
+
+
+  _visualizer.visualizeStage("Round Of Best 16", results);
   return quarter;
 }
 
@@ -58,7 +63,12 @@ Semi WM::playQuarterFinals(const Quarter &quarter)
   semi.result4 = _simulator->playMatch(quarter.result3.winner, quarter.result4.winner);
 
   std::vector<Result> results{semi.result1, semi.result2, semi.result3, semi.result4};
-  _visualizer->visualizeStage("Quarter Finals", results);
+
+  for (const auto result: results) {
+    _totalGoals += result.winnerGoals.get() + result.secondGoals.get();
+  }
+
+  _visualizer.visualizeStage("Quarter Finals", results);
 
   return semi;
 }
@@ -71,7 +81,12 @@ Final WM::playSemiFinals(const Semi &semi)
   final.result2 = _simulator->playMatch(semi.result4.winner, semi.result3.winner);
 
   std::vector<Result> results{final.result1, final.result2};
-  _visualizer->visualizeStage("Semi Finals", results);
+
+  for (const auto result: results) {
+    _totalGoals += result.winnerGoals.get() + result.secondGoals.get();
+  }
+
+  _visualizer.visualizeStage("Semi Finals", results);
 
   return final;
 }
@@ -79,7 +94,12 @@ Final WM::playSemiFinals(const Semi &semi)
 Team *WM::playFinal(const Final &final)
 {
   std::vector<Result> result{_simulator->playMatch(final.result1.winner, final.result2.winner)};
-  _visualizer->visualizeStage("Final", result);
+
+  for (const auto res: result) {
+    _totalGoals += res.winnerGoals.get() + res.secondGoals.get();
+  }
+
+  _visualizer.visualizeStage("Final", result);
   return result.at(0).winner;
 }
 
@@ -94,7 +114,11 @@ Result WM::playGroup(const std::string &groupName, Group *group)
   results.push_back(_simulator->playMatch(group->team4.get(), group->team1.get()));
   results.push_back(_simulator->playMatch(group->team2.get(), group->team3.get()));
 
-  _visualizer->visualizeStage(groupName, results);
+  _visualizer.visualizeStage(groupName, results);
+
+  for (const auto& result: results) {
+    _totalGoals += result.winnerGoals.get() + result.secondGoals.get();
+  }
 
   std::vector<Team *> teams{
       group->team1.get(), group->team2.get(), group->team3.get(), group->team4.get()};

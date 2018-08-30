@@ -12,11 +12,14 @@ using ws::wm::Result;
 
 class Visualizer {
 public:
-  Visualizer() = default;
+  explicit Visualizer(int* totalGoals) : totalGoals(totalGoals) {};
 
   ~Visualizer() = default;
 
   void visualizeStage(const std::string &stageName, const std::vector<Result> &results);
+
+private:
+  int* totalGoals;
 };
 
 }  // namespace vis
