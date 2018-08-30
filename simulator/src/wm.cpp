@@ -9,14 +9,14 @@ Best16 WM::playGroupPhase()
 {
   Best16 best;
 
-  auto futA = std::async(std::launch::async, [&]{ return playGroup("GroupA", &_groupA); });
-  auto futB = std::async(std::launch::async, [&]{ return playGroup("GroupB", &_groupB); });
-  auto futC = std::async(std::launch::async, [&]{ return playGroup("GroupC", &_groupC); });
-  auto futD = std::async(std::launch::async, [&]{ return playGroup("GroupD", &_groupD); });
-  auto futE = std::async(std::launch::async, [&]{ return playGroup("GroupE", &_groupE); });
-  auto futF = std::async(std::launch::async, [&]{ return playGroup("GroupF", &_groupF); });
-  auto futG = std::async(std::launch::async, [&]{ return playGroup("GroupG", &_groupG); });
-  auto futH = std::async(std::launch::async, [&]{ return playGroup("GroupH", &_groupH); });
+  auto futA = std::async(std::launch::async, [&] { return playGroup("GroupA", &_groupA); });
+  auto futB = std::async(std::launch::async, [&] { return playGroup("GroupB", &_groupB); });
+  auto futC = std::async(std::launch::async, [&] { return playGroup("GroupC", &_groupC); });
+  auto futD = std::async(std::launch::async, [&] { return playGroup("GroupD", &_groupD); });
+  auto futE = std::async(std::launch::async, [&] { return playGroup("GroupE", &_groupE); });
+  auto futF = std::async(std::launch::async, [&] { return playGroup("GroupF", &_groupF); });
+  auto futG = std::async(std::launch::async, [&] { return playGroup("GroupG", &_groupG); });
+  auto futH = std::async(std::launch::async, [&] { return playGroup("GroupH", &_groupH); });
 
   best.resultA = futA.get();
   best.resultB = futB.get();
@@ -27,14 +27,14 @@ Best16 WM::playGroupPhase()
   best.resultG = futG.get();
   best.resultH = futH.get();
 
-//  best.resultA = playGroup("Group A", &_groupA);
-//  best.resultB = playGroup("Group B", &_groupB);
-//  best.resultC = playGroup("Group C", &_groupC);
-//  best.resultD = playGroup("Group D", &_groupD);
-//  best.resultE = playGroup("Group E", &_groupE);
-//  best.resultF = playGroup("Group F", &_groupF);
-//  best.resultG = playGroup("Group G", &_groupG);
-//  best.resultH = playGroup("Group H", &_groupH);
+  //  best.resultA = playGroup("Group A", &_groupA);
+  //  best.resultB = playGroup("Group B", &_groupB);
+  //  best.resultC = playGroup("Group C", &_groupC);
+  //  best.resultD = playGroup("Group D", &_groupD);
+  //  best.resultE = playGroup("Group E", &_groupE);
+  //  best.resultF = playGroup("Group F", &_groupF);
+  //  best.resultG = playGroup("Group G", &_groupG);
+  //  best.resultH = playGroup("Group H", &_groupH);
 
   return best;
 }
@@ -43,14 +43,30 @@ Quarter WM::playRoundOfBest16(const Best16 &best)
 {
   Quarter quarter;
 
-  auto fut1 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultC.winner, best.resultD.second); });
-  auto fut2 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultA.winner, best.resultB.second); });
-  auto fut3 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultB.winner, best.resultA.second); });
-  auto fut4 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultD.winner, best.resultC.second); });
-  auto fut5 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultE.winner, best.resultF.second); });
-  auto fut6 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultG.winner, best.resultH.second); });
-  auto fut7 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultF.winner, best.resultE.second); });
-  auto fut8 = std::async(std::launch::async, [&]{ return _simulator->playMatch(best.resultH.winner, best.resultG.second); });
+  auto fut1 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultC.winner, best.resultD.second);
+  });
+  auto fut2 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultA.winner, best.resultB.second);
+  });
+  auto fut3 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultB.winner, best.resultA.second);
+  });
+  auto fut4 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultD.winner, best.resultC.second);
+  });
+  auto fut5 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultE.winner, best.resultF.second);
+  });
+  auto fut6 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultG.winner, best.resultH.second);
+  });
+  auto fut7 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultF.winner, best.resultE.second);
+  });
+  auto fut8 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(best.resultH.winner, best.resultG.second);
+  });
 
   quarter.result1 = fut1.get();
   quarter.result2 = fut2.get();
@@ -61,14 +77,14 @@ Quarter WM::playRoundOfBest16(const Best16 &best)
   quarter.result7 = fut7.get();
   quarter.result8 = fut8.get();
 
-//  quarter.result1 = _simulator->playMatch(best.resultC.winner, best.resultD.second;
-//  quarter.result2 = _simulator->playMatch(best.resultA.winner, best.resultB.second);
-//  quarter.result3 = _simulator->playMatch(best.resultB.winner, best.resultA.second);
-//  quarter.result4 = _simulator->playMatch(best.resultD.winner, best.resultC.second);
-//  quarter.result5 = _simulator->playMatch(best.resultE.winner, best.resultF.second);
-//  quarter.result6 = _simulator->playMatch(best.resultG.winner, best.resultH.second);
-//  quarter.result7 = _simulator->playMatch(best.resultF.winner, best.resultE.second);
-//  quarter.result8 = _simulator->playMatch(best.resultH.winner, best.resultG.second);
+  //  quarter.result1 = _simulator->playMatch(best.resultC.winner, best.resultD.second;
+  //  quarter.result2 = _simulator->playMatch(best.resultA.winner, best.resultB.second);
+  //  quarter.result3 = _simulator->playMatch(best.resultB.winner, best.resultA.second);
+  //  quarter.result4 = _simulator->playMatch(best.resultD.winner, best.resultC.second);
+  //  quarter.result5 = _simulator->playMatch(best.resultE.winner, best.resultF.second);
+  //  quarter.result6 = _simulator->playMatch(best.resultG.winner, best.resultH.second);
+  //  quarter.result7 = _simulator->playMatch(best.resultF.winner, best.resultE.second);
+  //  quarter.result8 = _simulator->playMatch(best.resultH.winner, best.resultG.second);
 
   std::vector<Result> results{quarter.result1,
                               quarter.result2,
@@ -87,20 +103,28 @@ Semi WM::playQuarterFinals(const Quarter &quarter)
 {
   Semi semi;
 
-  auto fut1 = std::async(std::launch::async, [&]{ return _simulator->playMatch(quarter.result1.winner, quarter.result2.winner); });
-  auto fut2 = std::async(std::launch::async, [&]{ return _simulator->playMatch(quarter.result5.winner, quarter.result6.winner); });
-  auto fut3 = std::async(std::launch::async, [&]{ return _simulator->playMatch(quarter.result7.winner, quarter.result8.winner); });
-  auto fut4 = std::async(std::launch::async, [&]{ return _simulator->playMatch(quarter.result3.winner, quarter.result4.winner); });
+  auto fut1 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(quarter.result1.winner, quarter.result2.winner);
+  });
+  auto fut2 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(quarter.result5.winner, quarter.result6.winner);
+  });
+  auto fut3 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(quarter.result7.winner, quarter.result8.winner);
+  });
+  auto fut4 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(quarter.result3.winner, quarter.result4.winner);
+  });
 
   semi.result1 = fut1.get();
   semi.result2 = fut2.get();
   semi.result3 = fut3.get();
   semi.result4 = fut4.get();
 
-//  semi.result1 = _simulator->playMatch(quarter.result1.winner, quarter.result2.winner);
-//  semi.result2 = _simulator->playMatch(quarter.result5.winner, quarter.result6.winner);
-//  semi.result3 = _simulator->playMatch(quarter.result7.winner, quarter.result8.winner);
-//  semi.result4 = _simulator->playMatch(quarter.result3.winner, quarter.result4.winner);
+  //  semi.result1 = _simulator->playMatch(quarter.result1.winner, quarter.result2.winner);
+  //  semi.result2 = _simulator->playMatch(quarter.result5.winner, quarter.result6.winner);
+  //  semi.result3 = _simulator->playMatch(quarter.result7.winner, quarter.result8.winner);
+  //  semi.result4 = _simulator->playMatch(quarter.result3.winner, quarter.result4.winner);
 
   std::vector<Result> results{semi.result1, semi.result2, semi.result3, semi.result4};
   _visualizer->visualizeStage("Quarter Finals", results);
@@ -112,14 +136,18 @@ Final WM::playSemiFinals(const Semi &semi)
 {
   Final final;
 
-  auto fut1 = std::async(std::launch::async, [&]{ return _simulator->playMatch(semi.result1.winner, semi.result2.winner); });
-  auto fut2 = std::async(std::launch::async, [&]{ return _simulator->playMatch(semi.result4.winner, semi.result3.winner); });
+  auto fut1 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(semi.result1.winner, semi.result2.winner);
+  });
+  auto fut2 = std::async(std::launch::async, [&] {
+    return _simulator->playMatch(semi.result4.winner, semi.result3.winner);
+  });
 
   final.result1 = fut1.get();
   final.result2 = fut2.get();
 
-//  final.result1 = _simulator->playMatch(semi.result1.winner, semi.result2.winner);
-//  final.result2 = _simulator->playMatch(semi.result4.winner, semi.result3.winner);
+  //  final.result1 = _simulator->playMatch(semi.result1.winner, semi.result2.winner);
+  //  final.result2 = _simulator->playMatch(semi.result4.winner, semi.result3.winner);
 
   std::vector<Result> results{final.result1, final.result2};
   _visualizer->visualizeStage("Semi Finals", results);
@@ -162,39 +190,36 @@ Result WM::playGroup(const std::string &groupName, Group *group)
   return result;
 }
 
-void WM::playWM()
+Team* WM::playWM()
 {
-  _groupA = createGroup(
-    TeamName("Frankreich"), TeamName("Rumänien"), TeamName("Albanien"), TeamName("Schweiz"));
-  _groupB =
-    createGroup(TeamName("England"), TeamName("Rußland"), TeamName("Wales"), TeamName("Slowakei"));
-  _groupC = createGroup(
-    TeamName("Deutschland"), TeamName("Ukraine"), TeamName("Polen"), TeamName("Nordirland"));
-  _groupD = createGroup(
-    TeamName("Spanien"), TeamName("Tschechien"), TeamName("Türkei"), TeamName("Kroatien"));
-  _groupE =
-    createGroup(TeamName("Belgien"), TeamName("Italien"), TeamName("Irland"), TeamName("Schweden"));
-  _groupF = createGroup(
-    TeamName("Portugal"), TeamName("Island"), TeamName("Österreich"), TeamName("Ungarn"));
-  _groupG = createGroup(
-    TeamName("Bulgarien"), TeamName("Dänemark"), TeamName("Finnland"), TeamName("Griechenland"));
-  _groupH = createGroup(
-    TeamName("Niederlande"), TeamName("Schottland"), TeamName("Israel"), TeamName("Lettland"));
+  _groupA = createGroup("Frankreich", "Rumänien", "Albanien", "Schweiz");
+  _groupB = createGroup("England", "Rußland", "Wales", "Slowakei");
+  _groupC = createGroup("Deutschland", "Ukraine", "Polen", "Nordirland");
+  _groupD = createGroup("Spanien", "Tschechien", "Türkei", "Kroatien");
+  _groupE = createGroup("Belgien", "Italien", "Irland", "Schweden");
+  _groupF = createGroup("Portugal", "Island", "Österreich", "Ungarn");
+  _groupG = createGroup("Bulgarien", "Dänemark", "Finnland", "Griechenland");
+  _groupH = createGroup("Niederlande", "Schottland", "Israel", "Lettland");
 
   auto best16  = playGroupPhase();
   auto quarter = playRoundOfBest16(best16);
   auto semi    = playQuarterFinals(quarter);
   auto final   = playSemiFinals(semi);
   auto winner  = playFinal(final);
+
+  return winner;
 }
 
-Group WM::createGroup(TeamName team1, TeamName team2, TeamName team3, TeamName team4) const
+Group WM::createGroup(std::string team1,
+                      std::string team2,
+                      std::string team3,
+                      std::string team4) const
 {
   Group group;
-  group.team1 = _simulator->getTeam(team1);
-  group.team2 = _simulator->getTeam(team2);
-  group.team3 = _simulator->getTeam(team3);
-  group.team4 = _simulator->getTeam(team4);
+  group.team1 = _simulator->getTeam(TeamName(team1));
+  group.team2 = _simulator->getTeam(TeamName(team2));
+  group.team3 = _simulator->getTeam(TeamName(team3));
+  group.team4 = _simulator->getTeam(TeamName(team4));
   return group;
 }
 

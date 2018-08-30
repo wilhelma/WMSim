@@ -16,7 +16,7 @@ class WM
   explicit WM(Simulator *simulator) : _simulator(simulator) {}
   ~WM() = default;
 
-  void playWM();
+  Team* playWM();
   Best16 playGroupPhase();
   Quarter playRoundOfBest16(const Best16 &best);
   Semi playQuarterFinals(const Quarter &quarter);
@@ -31,7 +31,7 @@ class WM
   Group _groupA, _groupB, _groupC, _groupD, _groupE, _groupF, _groupG, _groupH;
 
   Result playGroup(const std::string &groupName, Group*);
-  Group createGroup(TeamName team1, TeamName team2, TeamName team3, TeamName team4) const;
+  Group createGroup(std::string team1, std::string team2, std::string team3, std::string team4) const;
 };
 
 }  // namespace ws::wm
