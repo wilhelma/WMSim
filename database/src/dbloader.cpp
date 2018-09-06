@@ -126,14 +126,17 @@ Loader::getPlayersOfMatch(const Match &match)
                        " AND LandNr=" + std::to_string(id.get())};
 
     if (sqlite3_prepare_v2(connection, select.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
-      int numPlayers{0};
-      std::vector<std::future<void>> futures;
+  //    int numPlayers{0};
+  //    std::vector<std::future<void>> futures;
+  //    while (sqlite3_step(stmt) == SQLITE_ROW) {
+  //      futures.emplace_back(std::async(std::launch::async, [&] {
+  //        players.emplace_back(fillPlayer(PlayerId(sqlite3_column_int(stmt, 2))));
+  //      }));
+  //    }
+  //    for (auto &f : futures) { f.get(); }
       while (sqlite3_step(stmt) == SQLITE_ROW) {
-        futures.emplace_back(std::async(std::launch::async, [&] {
           players.emplace_back(fillPlayer(PlayerId(sqlite3_column_int(stmt, 2))));
-        }));
       }
-      for (auto &f : futures) { f.get(); }
       sqlite3_finalize(stmt);
     }
 
