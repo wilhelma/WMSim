@@ -12,49 +12,15 @@ Best16 WM::playGroupPhase()
 {
   Best16 best;
 
-//  auto futA = std::async(std::launch::async, [&] { return playGroup("GroupA", &_groupA); });
-//  auto futB = std::async(std::launch::async, [&] { return playGroup("GroupB", &_groupB); });
-//  auto futC = std::async(std::launch::async, [&] { return playGroup("GroupC", &_groupC); });
-//  auto futD = std::async(std::launch::async, [&] { return playGroup("GroupD", &_groupD); });
-//  auto futE = std::async(std::launch::async, [&] { return playGroup("GroupE", &_groupE); });
-//  auto futF = std::async(std::launch::async, [&] { return playGroup("GroupF", &_groupF); });
-//  auto futG = std::async(std::launch::async, [&] { return playGroup("GroupG", &_groupG); });
-//  auto futH = std::async(std::launch::async, [&] { return playGroup("GroupH", &_groupH); });
-//
-//  best.resultA = futA.get();
-//  best.resultB = futB.get();
-//  best.resultC = futC.get();
-//  best.resultD = futD.get();
-//  best.resultE = futE.get();
-//  best.resultF = futF.get();
-//  best.resultG = futG.get();
-//  best.resultH = futH.get();
-
-  graph g;
-
-  broadcast_node<continue_msg> init(g);
-  continue_node<continue_msg> playA(g, [&](continue_msg m) { best.resultA = playGroup("groupA", &_groupA); });
-  continue_node<continue_msg> playB(g, [&](continue_msg m) { best.resultB = playGroup("groupB", &_groupB); });
-  continue_node<continue_msg> playC(g, [&](continue_msg m) { best.resultC = playGroup("groupC", &_groupC); });
-  continue_node<continue_msg> playD(g, [&](continue_msg m) { best.resultD = playGroup("groupD", &_groupD); });
-  continue_node<continue_msg> playE(g, [&](continue_msg m) { best.resultE = playGroup("groupE", &_groupE); });
-  continue_node<continue_msg> playF(g, [&](continue_msg m) { best.resultF = playGroup("groupF", &_groupF); });
-  continue_node<continue_msg> playG(g, [&](continue_msg m) { best.resultG = playGroup("groupG", &_groupG); });
-  continue_node<continue_msg> playH(g, [&](continue_msg m) { best.resultH = playGroup("groupH", &_groupH); });
-
-  make_edge(init, playA);
-  make_edge(init, playB);
-  make_edge(init, playC);
-  make_edge(init, playD);
-  make_edge(init, playE);
-  make_edge(init, playF);
-  make_edge(init, playG);
-  make_edge(init, playH);
-
-  init.try_put(continue_msg());
-
-  g.wait_for_all();
-
+  best.resultA = playGroup("groupA", &_groupA);
+  best.resultB = playGroup("groupB", &_groupB);
+  best.resultC = playGroup("groupC", &_groupC);
+  best.resultD = playGroup("groupD", &_groupD);
+  best.resultE = playGroup("groupE", &_groupE);
+  best.resultF = playGroup("groupF", &_groupF);
+  best.resultG = playGroup("groupG", &_groupG);
+  best.resultH = playGroup("groupH", &_groupH);
+  
   return best;
 }
 
