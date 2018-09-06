@@ -1,4 +1,5 @@
 #include "dbloader.h"
+#include <future>
 
 namespace {
 sqlite3 *openConnection(const char *database)
@@ -46,14 +47,14 @@ std::unique_ptr<Team> Loader::getTeam(const TeamName &teamName)
   }
 
   auto team = std::make_unique<Team>(teamName,
-            TeamId(sqlite3_column_int(stmt, 3)),
-            NumParticipations(sqlite3_column_int(stmt, 13)),
-            NumGames(sqlite3_column_int(stmt, 15)),
-            NumGames(sqlite3_column_int(stmt, 16)),
-            NumGames(sqlite3_column_int(stmt, 17)),
-            NumGames(sqlite3_column_int(stmt, 18)),
-            NumGoals(sqlite3_column_int(stmt, 19)),
-            NumGoals(sqlite3_column_int(stmt, 20)));
+                                     TeamId(sqlite3_column_int(stmt, 3)),
+                                     NumParticipations(sqlite3_column_int(stmt, 13)),
+                                     NumGames(sqlite3_column_int(stmt, 15)),
+                                     NumGames(sqlite3_column_int(stmt, 16)),
+                                     NumGames(sqlite3_column_int(stmt, 17)),
+                                     NumGames(sqlite3_column_int(stmt, 18)),
+                                     NumGoals(sqlite3_column_int(stmt, 19)),
+                                     NumGoals(sqlite3_column_int(stmt, 20)));
 
   sqlite3_finalize(stmt);
 
@@ -89,18 +90,19 @@ std::vector<Match> Loader::getMatchesBetween(const Team &team1, const Team &team
   auto selectMatches = [&](const Team &t1, const Team &t2) {
     auto connection = getConnection();
     sqlite3_stmt *stmt;
-    std::string select{"SELECT * FROM Paarungen WHERE Heim=\"" + t1.name.get() +
-                       "\" AND Gast=\"" + t2.name.get() + "\""};
+    std::string select{"SELECT * FROM Paarungen WHERE Heim=\"" + t1.name.get() + "\" AND Gast=\"" +
+                       t2.name.get() + "\""};
 
     if (sqlite3_prepare_v2(connection, select.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
       while (sqlite3_step(stmt) == SQLITE_ROW) {
-        matches.emplace_back(Match(MatchId(sqlite3_column_int(stmt, 13)),
-                                   Round(sqlite3_column_int(stmt, 16)),
-                                   Year(sqlite3_column_int(stmt, 0)),
-                                   NumGoals(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 3 : 4)),
-                                   NumGoals(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 4 : 3)),
-                                   TeamId(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 11 : 12)),
-                                   TeamId(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 12 : 11))));
+        matches.emplace_back(
+          Match(MatchId(sqlite3_column_int(stmt, 13)),
+                Round(sqlite3_column_int(stmt, 16)),
+                Year(sqlite3_column_int(stmt, 0)),
+                NumGoals(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 3 : 4)),
+                NumGoals(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 4 : 3)),
+                TeamId(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 11 : 12)),
+                TeamId(sqlite3_column_int(stmt, (t1.id.get() == team1.id.get()) ? 12 : 11))));
       }
       sqlite3_finalize(stmt);
     }
@@ -124,9 +126,14 @@ Loader::getPlayersOfMatch(const Match &match)
                        " AND LandNr=" + std::to_string(id.get())};
 
     if (sqlite3_prepare_v2(connection, select.c_str(), -1, &stmt, NULL) == SQLITE_OK) {
+      int numPlayers{0};
+      std::vector<std::future<void>> futures;
       while (sqlite3_step(stmt) == SQLITE_ROW) {
-        players.emplace_back(fillPlayer(PlayerId(sqlite3_column_int(stmt, 2))));
+        futures.emplace_back(std::async(std::launch::async, [&] {
+          players.emplace_back(fillPlayer(PlayerId(sqlite3_column_int(stmt, 2))));
+        }));
       }
+      for (auto &f : futures) { f.get(); }
       sqlite3_finalize(stmt);
     }
 

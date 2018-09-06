@@ -34,14 +34,18 @@ set(DAT_INCLUDE_DIR database/include)
 set(SIM_INCLUDE_DIR simulator/include)
 set(VIS_INCLUDE_DIR visualization/include)
 
+set(TBB_INCLUDE_DIR /opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/include)
+set(TBB_LIBRARY_DIR /opt/intel/compilers_and_libraries_2018.3.222/linux/tbb/lib/intel64_lin/gcc4.7)
+
 file(GLOB_RECURSE HEADERS
         ${INCLUDE_DIR}/*.h
         ${DAT_INCLUDE_DIR}/*.h
         ${SIM_INCLUDE_DIR}/*.h
         ${VIS_INCLUDE_DIR}/*.h)
 
-include_directories(${INCLUDE_DIR} ${DAT_INCLUDE_DIR} ${SIM_INCLUDE_DIR} ${VIS_INCLUDE_DIR})
+include_directories(${INCLUDE_DIR} ${DAT_INCLUDE_DIR} ${SIM_INCLUDE_DIR} ${VIS_INCLUDE_DIR} ${TBB_INCLUDE_DIR})
+link_directories(${TBB_LIBRARY_DIR})
 
 add_executable(${THIS} ${SOURCES} ${HEADERS})
 add_dependencies(${THIS} sqlite)
-target_link_libraries(${THIS} sqlite3 pthread)
+target_link_libraries(${THIS} sqlite3 pthread tbb)

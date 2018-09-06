@@ -2,6 +2,9 @@
 #include <wm.h>
 #include <algorithm>
 #include <future>
+#include <tbb/flow_graph.h>
+
+using namespace tbb::flow;
 
 namespace ws::wm {
 
@@ -9,32 +12,48 @@ Best16 WM::playGroupPhase()
 {
   Best16 best;
 
-  auto futA = std::async(std::launch::async, [&] { return playGroup("GroupA", &_groupA); });
-  auto futB = std::async(std::launch::async, [&] { return playGroup("GroupB", &_groupB); });
-  auto futC = std::async(std::launch::async, [&] { return playGroup("GroupC", &_groupC); });
-  auto futD = std::async(std::launch::async, [&] { return playGroup("GroupD", &_groupD); });
-  auto futE = std::async(std::launch::async, [&] { return playGroup("GroupE", &_groupE); });
-  auto futF = std::async(std::launch::async, [&] { return playGroup("GroupF", &_groupF); });
-  auto futG = std::async(std::launch::async, [&] { return playGroup("GroupG", &_groupG); });
-  auto futH = std::async(std::launch::async, [&] { return playGroup("GroupH", &_groupH); });
+//  auto futA = std::async(std::launch::async, [&] { return playGroup("GroupA", &_groupA); });
+//  auto futB = std::async(std::launch::async, [&] { return playGroup("GroupB", &_groupB); });
+//  auto futC = std::async(std::launch::async, [&] { return playGroup("GroupC", &_groupC); });
+//  auto futD = std::async(std::launch::async, [&] { return playGroup("GroupD", &_groupD); });
+//  auto futE = std::async(std::launch::async, [&] { return playGroup("GroupE", &_groupE); });
+//  auto futF = std::async(std::launch::async, [&] { return playGroup("GroupF", &_groupF); });
+//  auto futG = std::async(std::launch::async, [&] { return playGroup("GroupG", &_groupG); });
+//  auto futH = std::async(std::launch::async, [&] { return playGroup("GroupH", &_groupH); });
+//
+//  best.resultA = futA.get();
+//  best.resultB = futB.get();
+//  best.resultC = futC.get();
+//  best.resultD = futD.get();
+//  best.resultE = futE.get();
+//  best.resultF = futF.get();
+//  best.resultG = futG.get();
+//  best.resultH = futH.get();
 
-  best.resultA = futA.get();
-  best.resultB = futB.get();
-  best.resultC = futC.get();
-  best.resultD = futD.get();
-  best.resultE = futE.get();
-  best.resultF = futF.get();
-  best.resultG = futG.get();
-  best.resultH = futH.get();
+  graph g;
 
-  //  best.resultA = playGroup("Group A", &_groupA);
-  //  best.resultB = playGroup("Group B", &_groupB);
-  //  best.resultC = playGroup("Group C", &_groupC);
-  //  best.resultD = playGroup("Group D", &_groupD);
-  //  best.resultE = playGroup("Group E", &_groupE);
-  //  best.resultF = playGroup("Group F", &_groupF);
-  //  best.resultG = playGroup("Group G", &_groupG);
-  //  best.resultH = playGroup("Group H", &_groupH);
+  broadcast_node<continue_msg> init(g);
+  continue_node<continue_msg> playA(g, [&](continue_msg m) { best.resultA = playGroup("groupA", &_groupA); });
+  continue_node<continue_msg> playB(g, [&](continue_msg m) { best.resultB = playGroup("groupB", &_groupB); });
+  continue_node<continue_msg> playC(g, [&](continue_msg m) { best.resultC = playGroup("groupC", &_groupC); });
+  continue_node<continue_msg> playD(g, [&](continue_msg m) { best.resultD = playGroup("groupD", &_groupD); });
+  continue_node<continue_msg> playE(g, [&](continue_msg m) { best.resultE = playGroup("groupE", &_groupE); });
+  continue_node<continue_msg> playF(g, [&](continue_msg m) { best.resultF = playGroup("groupF", &_groupF); });
+  continue_node<continue_msg> playG(g, [&](continue_msg m) { best.resultG = playGroup("groupG", &_groupG); });
+  continue_node<continue_msg> playH(g, [&](continue_msg m) { best.resultH = playGroup("groupH", &_groupH); });
+
+  make_edge(init, playA);
+  make_edge(init, playB);
+  make_edge(init, playC);
+  make_edge(init, playD);
+  make_edge(init, playE);
+  make_edge(init, playF);
+  make_edge(init, playG);
+  make_edge(init, playH);
+
+  init.try_put(continue_msg());
+
+  g.wait_for_all();
 
   return best;
 }
@@ -164,14 +183,44 @@ Team *WM::playFinal(const Final &final)
 
 Result WM::playGroup(const std::string &groupName, Group *group)
 {
-  std::vector<Result> results;
+  std::vector<Result> results(6);
 
-  results.push_back(_simulator->playMatch(group->team1.get(), group->team2.get()));
-  results.push_back(_simulator->playMatch(group->team3.get(), group->team4.get()));
-  results.push_back(_simulator->playMatch(group->team1.get(), group->team3.get()));
-  results.push_back(_simulator->playMatch(group->team4.get(), group->team2.get()));
-  results.push_back(_simulator->playMatch(group->team4.get(), group->team1.get()));
-  results.push_back(_simulator->playMatch(group->team2.get(), group->team3.get()));
+  graph h;
+  broadcast_node<continue_msg> init(h);
+
+  continue_node<continue_msg>
+      playGame1(h, [&](continue_msg msg) {
+    results[0] = _simulator->playMatch(group->team1.get(), group->team2.get());
+  }),
+      playGame2(h, [&](continue_msg msg) {
+    results[1] = _simulator->playMatch(group->team3.get(), group->team4.get());
+  }),
+      playGame3(h, [&](continue_msg msg) {
+    results[2] = _simulator->playMatch(group->team1.get(), group->team3.get());
+  }),
+      playGame4(h, [&](continue_msg msg) {
+    results[3] = _simulator->playMatch(group->team4.get(), group->team2.get());
+  }),
+      playGame5(h, [&](continue_msg msg) {
+    results[4] = _simulator->playMatch(group->team4.get(), group->team1.get());
+  }),
+      playGame6(h, [&](continue_msg msg) {
+    results[5] = _simulator->playMatch(group->team2.get(), group->team3.get());
+  });
+
+  make_edge(init, playGame1);
+  make_edge(init, playGame2);
+  make_edge(playGame1, playGame3);
+  make_edge(playGame1, playGame4);
+  make_edge(playGame2, playGame3);
+  make_edge(playGame2, playGame4);
+  make_edge(playGame3, playGame5);
+  make_edge(playGame3, playGame6);
+  make_edge(playGame4, playGame5);
+  make_edge(playGame4, playGame6);
+
+  init.try_put(continue_msg());
+  h.wait_for_all();
 
   _visualizer->visualizeStage(groupName, results);
 
@@ -190,24 +239,171 @@ Result WM::playGroup(const std::string &groupName, Group *group)
   return result;
 }
 
+#define GROUP(name, var) tbb::flow::function_node<continue_msg, Result> name(g, 1, [&](continue_msg m) { return playGroup("name", &var); });
+
 Team* WM::playWM()
 {
-  _groupA = createGroup("Frankreich", "Rumänien", "Albanien", "Schweiz");
-  _groupB = createGroup("England", "Rußland", "Wales", "Slowakei");
-  _groupC = createGroup("Deutschland", "Ukraine", "Polen", "Nordirland");
-  _groupD = createGroup("Spanien", "Tschechien", "Türkei", "Kroatien");
-  _groupE = createGroup("Belgien", "Italien", "Irland", "Schweden");
-  _groupF = createGroup("Portugal", "Island", "Österreich", "Ungarn");
-  _groupG = createGroup("Bulgarien", "Dänemark", "Finnland", "Griechenland");
-  _groupH = createGroup("Niederlande", "Schottland", "Israel", "Lettland");
+  _groupA = createGroup("Russia", "SaudiArabia", "Egypt", "Uruguay");
+  _groupB = createGroup("Portugal", "Spain", "Morocco", "Iran");
+  _groupC = createGroup("France", "Australia", "Peru", "Denmark");
+  _groupD = createGroup("Argentinia", "Iceland", "Croatia", "Nigeria");
+  _groupE = createGroup("Brazil", "Switzerland", "CostaRica", "Serbia");
+  _groupF = createGroup("Germany", "Mexico", "Sweden", "SouthKorea");
+  _groupG = createGroup("Belgium", "Panama", "Tunisia", "England");
+  _groupH = createGroup("Poland", "Senegal", "Colombia", "Japan");
 
-  auto best16  = playGroupPhase();
-  auto quarter = playRoundOfBest16(best16);
-  auto semi    = playQuarterFinals(quarter);
-  auto final   = playSemiFinals(semi);
-  auto winner  = playFinal(final);
+  graph g;
+  broadcast_node<continue_msg> init(g);
 
-  return winner;
+  // group phase
+  function_node<continue_msg, Result> playA(g, 1, [&](continue_msg m) { return playGroup("groupA", &_groupA); });
+  function_node<continue_msg, Result> playB(g, 1, [&](continue_msg m) { return playGroup("groupB", &_groupB); });
+  function_node<continue_msg, Result> playC(g, 1, [&](continue_msg m) { return playGroup("groupC", &_groupC); });
+  function_node<continue_msg, Result> playD(g, 1, [&](continue_msg m) { return playGroup("groupD", &_groupD); });
+  function_node<continue_msg, Result> playE(g, 1, [&](continue_msg m) { return playGroup("groupE", &_groupE); });
+  function_node<continue_msg, Result> playF(g, 1, [&](continue_msg m) { return playGroup("groupF", &_groupF); });
+  function_node<continue_msg, Result> playG(g, 1, [&](continue_msg m) { return playGroup("groupG", &_groupG); });
+  function_node<continue_msg, Result> playH(g, 1, [&](continue_msg m) { return playGroup("groupH", &_groupH); });
+
+  make_edge(init, playA);
+  make_edge(init, playB);
+  make_edge(init, playC);
+  make_edge(init, playD);
+  make_edge(init, playE);
+  make_edge(init, playF);
+  make_edge(init, playG);
+  make_edge(init, playH);
+
+  // round of best 16
+  join_node<tuple<Result, Result>> join_1(g), join_2(g), join_3(g), join_4(g), join_5(g), join_6(g), join_7(g), join_8(g);
+  function_node<tuple<Result, Result>, Result>
+      playBest16_1(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_2(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_3(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_4(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_5(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_6(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_7(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  }),
+      playBest16_8(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).second);
+  });
+
+  make_edge(playC, input_port<0>(join_1));
+  make_edge(playD, input_port<1>(join_1));
+  make_edge(join_1, playBest16_1);
+
+  make_edge(playA, input_port<0>(join_2));
+  make_edge(playB, input_port<1>(join_2));
+  make_edge(join_2, playBest16_2);
+
+  make_edge(playB, input_port<0>(join_3));
+  make_edge(playA, input_port<1>(join_3));
+  make_edge(join_3, playBest16_3);
+
+  make_edge(playD, input_port<0>(join_4));
+  make_edge(playC, input_port<1>(join_4));
+  make_edge(join_4, playBest16_4);
+
+  make_edge(playE, input_port<0>(join_5));
+  make_edge(playF, input_port<1>(join_5));
+  make_edge(join_5, playBest16_5);
+
+  make_edge(playG, input_port<0>(join_6));
+  make_edge(playH, input_port<1>(join_6));
+  make_edge(join_6, playBest16_6);
+
+  make_edge(playF, input_port<0>(join_7));
+  make_edge(playE, input_port<1>(join_7));
+  make_edge(join_7, playBest16_7);
+
+  make_edge(playH, input_port<0>(join_8));
+  make_edge(playG, input_port<1>(join_8));
+  make_edge(join_8, playBest16_8);
+
+  // quarter final
+  join_node<tuple<Result, Result>> join4_1(g), join4_2(g), join4_3(g), join4_4(g);
+  function_node<tuple<Result, Result>, Result>
+      playQuarter_1(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  }),
+      playQuarter_2(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  }),
+      playQuarter_3(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  }),
+      playQuarter_4(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  });
+
+  make_edge(playBest16_1, input_port<0>(join4_1));
+  make_edge(playBest16_2, input_port<1>(join4_1));
+  make_edge(join4_1, playQuarter_1);
+
+  make_edge(playBest16_5, input_port<0>(join4_2));
+  make_edge(playBest16_6, input_port<1>(join4_2));
+  make_edge(join4_2, playQuarter_2);
+
+  make_edge(playBest16_7, input_port<0>(join4_3));
+  make_edge(playBest16_8, input_port<1>(join4_3));
+  make_edge(join4_3, playQuarter_3);
+
+  make_edge(playBest16_3, input_port<0>(join4_4));
+  make_edge(playBest16_4, input_port<1>(join4_4));
+  make_edge(join4_4, playQuarter_4);
+
+  // semi final
+  join_node<tuple<Result, Result>> join2_1(g), join2_2(g);
+  function_node<tuple<Result, Result>, Result>
+      playSemi_1(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  }),
+      playSemi_2(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  });
+
+  make_edge(playQuarter_1, input_port<0>(join2_1));
+  make_edge(playQuarter_2, input_port<1>(join2_1));
+  make_edge(join2_1, playSemi_1);
+
+  make_edge(playQuarter_4, input_port<0>(join2_2));
+  make_edge(playQuarter_3, input_port<1>(join2_2));
+  make_edge(join2_2, playSemi_2);
+
+  // final
+  join_node<tuple<Result, Result>> join1(g);
+  function_node<tuple<Result, Result>, Result>
+      playFinalNode(g, 1, [&](const tuple<Result, Result> &result) {
+    return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+  });
+
+  make_edge(playSemi_1, input_port<0>(join1));
+  make_edge(playSemi_2, input_port<1>(join1));
+  make_edge(join1, playFinalNode);
+
+  init.try_put(continue_msg());
+
+  g.wait_for_all();
+
+  Result result;
+
+  playFinalNode.try_get(result);
+
+  return result.winner;
 }
 
 Group WM::createGroup(std::string team1,
