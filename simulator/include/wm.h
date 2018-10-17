@@ -4,6 +4,7 @@
 #include "model.h"
 #include "simulator.h"
 #include "visualizer.h"
+#include <tbb/flow_graph.h>
 
 namespace ws::wm {
 
@@ -17,11 +18,6 @@ class WM
   ~WM() = default;
 
   Team* playWM();
-  Best16 playGroupPhase();
-  Quarter playRoundOfBest16(const Best16 &best);
-  Semi playQuarterFinals(const Quarter &quarter);
-  Final playSemiFinals(const Semi &semi);
-  Team *playFinal(const Final &final);
 
  private:
   Simulator *_simulator;
