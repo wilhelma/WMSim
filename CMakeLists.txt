@@ -11,7 +11,7 @@ set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "-fno-omit-frame-pointer")
 ExternalProject_Add (sqlite
         SOURCE_DIR ${CMAKE_CURRENT_BINARY_DIR}/sqlite
         URL http://www.sqlite.org/2018/sqlite-autoconf-3220000.tar.gz
-        CONFIGURE_COMMAND ${CMAKE_CURRENT_BINARY_DIR}/sqlite/configure
+        CONFIGURE_COMMAND ${CMAKE_CURRENT_BINARY_DIR}/sqlite/configure --disable-threadsafe
         BUILD_COMMAND ${MAKE}
         BUILD_IN_SOURCE 1
         INSTALL_COMMAND ""
