@@ -19,7 +19,8 @@ int main(int argc, char** argv)
     auto simulator = std::make_unique<ws::sim::Simulator>(loader.get());
     auto wm = std::make_unique<ws::wm::WM>(simulator.get());
 
-    wm->playWM();
+    auto result = wm->playWM();
+    std::cout << "winner is " << result->name.get() << '\n';
   } else {
     std::cerr << "Cannot open file " << argv[1];
     return -1;

@@ -73,6 +73,8 @@ namespace wm {
   Team* WM::playWM()
   {
 
+//    tbb::task_scheduler_init sched(4);
+
     _groupA = createGroup("Frankreich", "Rumänien", "Albanien", "Schweiz");
     _groupB = createGroup("England", "Rußland", "Wales", "Slowakei");
     _groupC = createGroup("Deutschland", "Ukraine", "Polen", "Nordirland");
@@ -216,9 +218,11 @@ namespace wm {
 
     // final
     join_node<tuple<Result, Result>> join1(g);
+    Result finalResult;
     function_node<tuple<Result, Result>, Result>
     playFinalNode(g, 1, [&](const tuple<Result, Result> &result) {
-      return _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+      finalResult = _simulator->playMatch(std::get<0>(result).winner, std::get<1>(result).winner);
+      return finalResult;
     });
 
     make_edge(playSemi_1, input_port<0>(join1));
@@ -229,11 +233,7 @@ namespace wm {
 
     g.wait_for_all();
 
-    Result result;
-
-    playFinalNode.try_get(result);
-
-    return result.winner;
+    return finalResult.winner;
   }
 
   Group WM::createGroup(std::string team1,

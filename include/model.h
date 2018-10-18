@@ -100,6 +100,7 @@ struct Result {
     : winner(winner), second(second), winnerGoals(winnerGoals), secondGoals(secondGoals)
   {}
   Result() : winner(nullptr), second(nullptr), winnerGoals(NumGoals(0)), secondGoals(NumGoals(0)) {}
+  Result& operator=(const Result&) = default;
   ~Result() = default;
 };
 
