@@ -1,5 +1,6 @@
 #include "wm.h"
 #include <wm.h>
+#include <algorithm>
 
 namespace ws::wm {
 
