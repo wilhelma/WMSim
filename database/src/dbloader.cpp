@@ -136,6 +136,8 @@ Loader::getPlayersOfMatch(const Match &match)
     return std::move(players);
   };
 
+  
+
   return std::make_tuple(getPlayersOfTeam(match.t1Id), getPlayersOfTeam(match.t2Id));
 }
 

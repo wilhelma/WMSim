@@ -12,54 +12,44 @@ namespace wm {
 
   Result WM::playGroup(const std::string &groupName, Group *group)
   {
-//    std::vector<Result> results(6);
-//
-//    graph h;
-//    broadcast_node<continue_msg> init(h);
-//
-//    continue_node<continue_msg>
-//    playGame1(h, [&](continue_msg msg) {
-//      results[0] = _simulator->playMatch(group->team1.get(), group->team2.get());
-//    }),
-//    playGame2(h, [&](continue_msg msg) {
-//      results[1] = _simulator->playMatch(group->team3.get(), group->team4.get());
-//    }),
-//    playGame3(h, [&](continue_msg msg) {
-//      results[2] = _simulator->playMatch(group->team1.get(), group->team3.get());
-//    }),
-//    playGame4(h, [&](continue_msg msg) {
-//      results[3] = _simulator->playMatch(group->team4.get(), group->team2.get());
-//    }),
-//    playGame5(h, [&](continue_msg msg) {
-//      results[4] = _simulator->playMatch(group->team4.get(), group->team1.get());
-//    }),
-//    playGame6(h, [&](continue_msg msg) {
-//      results[5] = _simulator->playMatch(group->team2.get(), group->team3.get());
-//    });
-//
-//    make_edge(init, playGame1);
-//    make_edge(init, playGame2);
-//    make_edge(playGame1, playGame3);
-//    make_edge(playGame1, playGame4);
-//    make_edge(playGame2, playGame3);
-//    make_edge(playGame2, playGame4);
-//    make_edge(playGame3, playGame5);
-//    make_edge(playGame3, playGame6);
-//    make_edge(playGame4, playGame5);
-//    make_edge(playGame4, playGame6);
-//
-//    init.try_put(continue_msg());
-//    h.wait_for_all();
-
-
     std::vector<Result> results(6);
 
-    results[0] = _simulator->playMatch(group->team1.get(), group->team2.get());
-    results[1] = _simulator->playMatch(group->team3.get(), group->team4.get());
-    results[2] = _simulator->playMatch(group->team1.get(), group->team3.get());
-    results[3] = _simulator->playMatch(group->team4.get(), group->team2.get());
-    results[4] = _simulator->playMatch(group->team4.get(), group->team1.get());
-    results[5] = _simulator->playMatch(group->team2.get(), group->team3.get());
+    graph h;
+    broadcast_node<continue_msg> init(h);
+
+    continue_node<continue_msg>
+    playGame1(h, [&](continue_msg msg) {
+      results[0] = _simulator->playMatch(group->team1.get(), group->team2.get());
+    }),
+    playGame2(h, [&](continue_msg msg) {
+      results[1] = _simulator->playMatch(group->team3.get(), group->team4.get());
+    }),
+    playGame3(h, [&](continue_msg msg) {
+      results[2] = _simulator->playMatch(group->team1.get(), group->team3.get());
+    }),
+    playGame4(h, [&](continue_msg msg) {
+      results[3] = _simulator->playMatch(group->team4.get(), group->team2.get());
+    }),
+    playGame5(h, [&](continue_msg msg) {
+      results[4] = _simulator->playMatch(group->team4.get(), group->team1.get());
+    }),
+    playGame6(h, [&](continue_msg msg) {
+      results[5] = _simulator->playMatch(group->team2.get(), group->team3.get());
+    });
+
+    make_edge(init, playGame1);
+    make_edge(init, playGame2);
+    make_edge(playGame1, playGame3);
+    make_edge(playGame1, playGame4);
+    make_edge(playGame2, playGame3);
+    make_edge(playGame2, playGame4);
+    make_edge(playGame3, playGame5);
+    make_edge(playGame3, playGame6);
+    make_edge(playGame4, playGame5);
+    make_edge(playGame4, playGame6);
+
+    init.try_put(continue_msg());
+    h.wait_for_all();
 
     _visualizer->visualizeStage(groupName, results);
 
